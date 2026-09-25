@@ -20,7 +20,7 @@
 
 ## Сборка
 
-Нужны JDK 17+ и Android SDK (проще всего поставить Android Studio).
+Нужны JDK 25 и Android SDK (проще всего поставить Android Studio).
 
 ```bash
 ./gradlew assembleDebug
