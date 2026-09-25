@@ -65,6 +65,20 @@ jobs:
           fi
           gh release upload "$GITHUB_REF_NAME" dist/* --clobber
 
+      # Зеркало на beacontable.ru (mirror-releases.yml в beacon-table-site).
+      # Токен тот же, что у основного репозитория; без него зеркало
+      # обновляют вручную из Actions сайта.
+      - name: Зеркало на сайте
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.SITE_REPO_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "SITE_REPO_TOKEN не задан — зеркало не обновляю"
+            exit 0
+          fi
+          gh api repos/major1ink/beacon-table-site/dispatches             -f event_type=android-release-published             -f "client_payload[tag]=$GITHUB_REF_NAME"
+
       - name: Артефакт прогона
         if: github.ref_type != 'tag'
         uses: actions/upload-artifact@v4
