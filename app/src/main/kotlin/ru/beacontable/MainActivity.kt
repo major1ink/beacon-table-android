@@ -32,8 +32,12 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
+import org.json.JSONObject
 
-private const val LAUNCHER = "https://appassets.androidplatform.net/assets/launcher.html"
+private const val ASSETS = "https://appassets.androidplatform.net"
+private const val LAUNCHER = "$ASSETS/assets/launcher.html"
 
 class MainActivity : ComponentActivity() {
 
@@ -42,6 +46,7 @@ class MainActivity : ComponentActivity() {
     private var clearHistory = false
     private var crashed = false
     private var fileCallback: ValueCallback<Array<Uri>>? = null
+    private val scanner by lazy { LanScanner(this) }
 
     private val assetLoader by lazy {
         WebViewAssetLoader.Builder()
@@ -89,6 +94,21 @@ class MainActivity : ComponentActivity() {
             download(url, userAgent, disposition, mimeType)
         }
 
+        // Мост только для экрана запуска: страницы серверов его не видят.
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addWebMessageListener(web, "beaconApp", setOf(ASSETS)) { _, message, _, isMainFrame, reply ->
+                if (!isMainFrame || message.data != "scan") return@addWebMessageListener
+                scanner.scan(
+                    onFound = { url, version ->
+                        reply.postMessage(JSONObject().put("found", url).put("version", version).toString())
+                    },
+                    onDone = { hasNetwork ->
+                        reply.postMessage(JSONObject().put("done", true).put("network", hasNetwork).toString())
+                    },
+                )
+            }
+        }
+
         onBackPressedDispatcher.addCallback(this) { back() }
 
         origin = savedInstanceState?.getString("origin")
@@ -117,6 +137,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        scanner.stop()
         if (!crashed) web.destroy()
         super.onDestroy()
     }
@@ -189,6 +210,7 @@ class MainActivity : ComponentActivity() {
             if (isLauncher(url)) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             } else {
+                scanner.stop()
                 window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
