@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#131318</color>
+    <color name="icon_bg">#0B1220</color>
+
+    <style name="Theme.BeaconTable" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorAccent">#7C6CF0</item>
+    </style>
+</resources>

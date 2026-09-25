@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Beacon Table</string>
+    <string name="leave_title">Выйти со стола?</string>
+    <string name="leave_message">Вернёмся к выбору сервера. Игра на сервере продолжится.</string>
+    <string name="leave_yes">Выйти</string>
+    <string name="leave_no">Остаться</string>
+    <string name="server_unreachable">Сервер %1$s не отвечает. Проверьте адрес и что телефон в той же сети.</string>
+    <string name="download_started">Скачивание: %1$s</string>
+    <string name="no_app_for_link">Нечем открыть ссылку</string>
+</resources>
